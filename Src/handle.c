@@ -9,6 +9,9 @@ uint32_t BOX_NUM = 1;
 uint32_t FULL_MASK = 0x80000000;
 static uint8_t leap[32][9] = {""};
 
+static uint8_t get_emtpy_bos(uint32_t box_status);
+
+/* cmp 8 Bytes */
 static uint8_t leap_cmp(uint8_t *src1, uint8_t *src2) {
 	int i = 8;
 	while (i--) {
@@ -22,6 +25,7 @@ static uint8_t leap_cmp(uint8_t *src1, uint8_t *src2) {
 	return 0;
 }
 
+/* cpy 8 Bytes */
 static void leap_cpy(uint8_t *des, uint8_t *src) {
 	int i = 8;
 	while (i--) {
@@ -30,26 +34,20 @@ static void leap_cpy(uint8_t *des, uint8_t *src) {
 }
 
 /**
-  * @Retvl: if a locationg is full, that bit will be @1
+  * @Retvl: if a locationg is full, each bit will be @1
   */
 static uint32_t leap_read(void) {
 	uint32_t buf = 0;
 	uint32_t loc = 0;
 	uint32_t cnt = BOX_NUM;
+	
 	while (cnt--) {
-		buf >>= 1;
-		if (*leap[loc++]) {
-			buf |= 0x80000000;
-		}
-	} return buf;
+		buf |= (*leap[loc] & 1) << loc;
+		loc++;
+	}
+	return buf;
 }
 
-static void leap_set(uint32_t loc) {
-	*leap[loc] = 1;
-}
-static void leap_clear(uint32_t loc) {
-	*leap[loc] = 0;
-}
 
 void Handle_Init(void) {
 	int i = 0;
@@ -133,24 +131,63 @@ uint32_t ID_Check_Handle(void *arg) {
 	/* add new id */
 	else {
 		/* search a void box */
-		for (i = 0; i < BOX_NUM; i++) {
-			if (*leap[i] == 0) {
-				/* find a empty box */
-				/* regist UID first */
-				leap_cpy(leap[i] + 1, recive_buff);
-				leap_set(i);
-				/* open box */
-				if (BSP_Box_Ctl(Box_ID(i)))
-					return 0x03;
-				SoundPlay(i);
-				return 0x00;
-			}
+		i = get_emtpy_bos(leap_read());
+		
+		// If there are some empty box, it'd not return a 0xFF
+		if ( i == 0xFF) {
+			/* voice memssage: "No box for you" */
+			SoundPlay(33);
+			return 0x02;
 		}
-		/* voice memssage : "No box for you" */
-		SoundPlay(33);
-		return 0x02;
+		else {
+			/* regist UID first */
+			leap_cpy(leap[i] + 1, recive_buff);
+			*leap[i] = 1;
+			
+			/* open box */
+			if (BSP_Box_Ctl(Box_ID(i)))
+				return 0x03;
+			SoundPlay(i);
+			return 0x00;
+		}
 	}
 	
+	// every thing is ok
 	return 0;
 	
+}
+
+__weak uint32_t getseed(void) {
+	static uint32_t code = 0x6713A1FD;
+	uint32_t buf;
+	if (code & 0x80000000)
+		buf = 1;
+	else
+		buf = 0;
+	
+	code <<= 1;
+	code |= buf;
+	code += 1;
+	return code;
+}
+
+/**
+  * @Para:  box_status - each bit @1-notempty, @0-empty
+  * @Retvl: @0xFF, didn't have a empty box
+            #else return a num means location
+  */
+static uint8_t get_emtpy_bos(uint32_t box_status) {
+	uint8_t loc = getseed() % BOX_NUM; // loc = (0 ~ BOX_NUM -1 )
+	uint32_t max_cnt = BOX_NUM;        // it will search BOX_NUM times(max)
+	
+	while (max_cnt--) {
+		if (box_status & Box_ID(loc)) {
+			return loc;
+		}
+		loc += 1;
+		if (loc >= BOX_NUM) {
+			loc = 0;
+		}
+	}
+	return 0xFF;
 }
