@@ -81,15 +81,15 @@ void Handle_Init(void) {
   */	uint32_t box_status;
 	uint8_t status = 0,i;
 	uint8_t recive_buff[8] = "";
-	uint8_t buf[2];
+	uint8_t rec_flag[2];
 uint32_t ID_Check_Handle(void *arg) {
 
-	buf[0] = getchar();
+	rec_flag[0] = getchar();
 	/* waiting there, until data comming */
 	for (i = 0; i < 8; i++) {
 		recive_buff[i] = getchar();
 	}
-	buf[1] = getchar();
+	rec_flag[1] = getchar();
 	
 	/* check box status */
 	box_status = BSP_Box_Check_L();
