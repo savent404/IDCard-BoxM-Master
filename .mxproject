@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=E:/Project/身份证保险柜/身份证保险柜/stm32f103_ze/Inc
+HeaderPath=E:/Project/MDK/身份证保险柜/stm32f103_ze/Inc
 HeaderFiles=stm32f1xx_it.h;stm32f1xx_hal_conf.h;mxconstants.h;
-SourcePath=E:/Project/身份证保险柜/身份证保险柜/stm32f103_ze/Src
+SourcePath=E:/Project/MDK/身份证保险柜/stm32f103_ze/Src
 SourceFiles=stm32f1xx_it.h;stm32f1xx_hal_conf.h;mxconstants.h;stm32f1xx_it.c;stm32f1xx_hal_msp.c;main.c;
 
 [PreviousLibFiles]

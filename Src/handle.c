@@ -76,18 +76,31 @@ void Handle_Init(void) {
             @1 "有柜子未关闭，拒绝任何操作"
             @2 "柜子已满"
             @3 "开锁错误"
+            @FF"通讯错误"
   */	uint32_t box_status;
 	uint8_t status = 0,i;
 	uint8_t recive_buff[8] = "";
-	uint8_t rec_flag[2];
+	uint8_t rec_flag[4];
 uint32_t ID_Check_Handle(void *arg) {
 
 	rec_flag[0] = getchar();
+	rec_flag[1] = getchar();
 	/* waiting there, until data comming */
 	for (i = 0; i < 8; i++) {
 		recive_buff[i] = getchar();
 	}
-	rec_flag[1] = getchar();
+	rec_flag[2] = getchar();
+	rec_flag[3] = getchar();
+	
+	/* rec_flag check */
+	if (rec_flag[0] != rec_flag[1])
+		return 0xFF;
+	if (rec_flag[2] != rec_flag[3])
+		return 0xFF;
+	if (rec_flag[0] != 0xAA)
+		return 0xFF;
+	if (rec_flag[2] != 0x55)
+		return 0x55;
 	
 	/* check box status */
 	box_status = BSP_Box_Check_L();
