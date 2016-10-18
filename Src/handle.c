@@ -194,7 +194,7 @@ static uint8_t get_emtpy_bos(uint32_t box_status) {
 	uint32_t max_cnt = BOX_NUM;        // it will search BOX_NUM times(max)
 	
 	while (max_cnt--) {
-		if (box_status & Box_ID(loc)) {
+		if ((box_status & Box_ID(loc)) == 0) {
 			return loc;
 		}
 		loc += 1;
