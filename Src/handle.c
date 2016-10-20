@@ -4,7 +4,7 @@
 #include "stdlib.h"
 #include "box_bsp.h"
 #include "nv_040c.h"
-
+//#define DEBUGE 1
 uint32_t BOX_NUM = 1;
 uint32_t FULL_MASK = 0x80000000;
 static uint8_t leap[32][9] = {""};
@@ -68,14 +68,14 @@ void Handle_Init(void) {
 		FULL_MASK >>= 1;
 		FULL_MASK |= 0x80000000;
 	}
-//	memset(leap, 0, (9*32));
-//	SoundPlay(0xE7);
-//	for (i = 0; i < BOX_NUM; i++) {
-//		if(!BSP_Box_Ctl(Box_ID(i))) {
-//			SoundPlay(i);
-//			HAL_Delay(2000);
-//		}
-//	}
+	memset(leap, 0, (9*32));
+	SoundPlay(0xE7);
+	for (i = 0; i < BOX_NUM; i++) {
+		if(!BSP_Box_Ctl(Box_ID(i))) {
+			SoundPlay(i);
+			HAL_Delay(2000);
+		}
+	}
 }
 
 /**
@@ -123,8 +123,8 @@ uint32_t ID_Check_Handle(void *arg) {
 	}
 	memset(rec_flag, 0, 4);
 	
-	#if (DEBUGE)
-	#else
+//	#if (DEBUGE)
+//	#else
 	/* check box status */
 	box_status = BSP_Box_Check_L();
 	if (box_status != 0xFFFFFFFF) {
@@ -143,7 +143,7 @@ uint32_t ID_Check_Handle(void *arg) {
 		}
 		box_status >>= 1;
 	}
-	#endif
+//	#endif
 	/* search the same id in leap */
 	status = 0;
 	for (i = 0; i < BOX_NUM; i++) {

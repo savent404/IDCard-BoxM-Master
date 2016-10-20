@@ -2,7 +2,7 @@
 
 void BSP_Box_Init(void) {
 	GPIO_InitTypeDef GPIOx;
-	
+	__HAL_RCC_GPIOA_CLK_ENABLE();
 	__HAL_RCC_GPIOB_CLK_ENABLE();
 	__HAL_RCC_GPIOC_CLK_ENABLE();
 	__HAL_RCC_GPIOD_CLK_ENABLE();
@@ -30,6 +30,12 @@ void BSP_Box_Init(void) {
 
 	HAL_GPIO_Init(GPIO_Port_CTL_L, &GPIOx);
 	HAL_GPIO_Init(GPIO_Port_CTL_H, &GPIOx);
+	
+	/* Box_Num init */
+	GPIOx.Mode = GPIO_MODE_INPUT;
+	GPIOx.Pull =  GPIO_PULLUP;
+	GPIOx.Pin = (GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6);
+	HAL_GPIO_Init(GPIOA, &GPIOx);
 }
 
 /**
@@ -73,6 +79,9 @@ uint32_t BSP_Box_Check_L(void) {
 	
 	//È¡·´
 	//buff = ~buff;
+	if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1) == GPIO_PIN_SET) {
+		buff = ~buff;
+	}
 	return buff;
 }
 
