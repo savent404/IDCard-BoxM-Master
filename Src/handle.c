@@ -8,6 +8,10 @@
 uint32_t BOX_NUM = 1;
 uint32_t FULL_MASK = 0x80000000;
 static uint8_t leap[32][9] = {""};
+
+__IO uint8_t Rec_Flag = 0;
+__IO uint8_t Rec_Err  = 0;
+
 unsigned char Check_Func(unsigned char* pt) {
 	int num = 8;
 	unsigned char ans = 0;
@@ -91,15 +95,21 @@ void Handle_Init(void) {
 uint32_t ID_Check_Handle(void *arg) {
 
 	rec_flag[0] = getchar();
+	Rec_Flag = 1;
 	rec_flag[1] = getchar();
 	/* waiting there, until data comming */
 	for (i = 0; i < 8; i++) {
 		recive_buff[i] = getchar();
+		if (Rec_Err == 1) {
+			Rec_Err = 0;
+			Rec_Flag = 0;
+			return 0xAA;
+		}
 	}
 	rec_flag[2] = getchar();
 	rec_flag[3] = getchar();
 	rec_flag[4] = getchar();
-	
+	Rec_Flag = 0;
 	/* rec_flag check */
 	if (rec_flag[0] != rec_flag[1]) {
 		memset(rec_flag, 0, 5);
