@@ -170,13 +170,12 @@ void SysTick_Handler(void)
 	extern __IO uint8_t Rec_Flag;
 	extern __IO uint8_t Rec_Err;
 	static uint8_t cnt = 0;
-  /* USER CODE END SysTick_IRQn 0 */
 	if (Rec_Flag && ++cnt > 100) {
 		Rec_Err = 1;
 	}
 	if (!Rec_Flag)
 		cnt = 0,Rec_Err = 0;
-	
+  /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   HAL_SYSTICK_IRQHandler();
   /* USER CODE BEGIN SysTick_IRQn 1 */
